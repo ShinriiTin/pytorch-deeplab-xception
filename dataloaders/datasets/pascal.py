@@ -7,6 +7,7 @@ from mypath import Path
 from torchvision import transforms
 from dataloaders import custom_transforms as tr
 
+
 class VOCSegmentation(Dataset):
     """
     PascalVoc dataset
@@ -63,7 +64,6 @@ class VOCSegmentation(Dataset):
     def __len__(self):
         return len(self.images)
 
-
     def __getitem__(self, index):
         _img, _target = self._make_img_gt_point_pair(index)
         sample = {'image': _img, 'label': _target}
@@ -73,7 +73,6 @@ class VOCSegmentation(Dataset):
                 return self.transform_tr(sample)
             elif split == 'val':
                 return self.transform_val(sample)
-
 
     def _make_img_gt_point_pair(self, index):
         _img = Image.open(self.images[index]).convert('RGB')
@@ -141,5 +140,3 @@ if __name__ == '__main__':
             break
 
     plt.show(block=True)
-
-

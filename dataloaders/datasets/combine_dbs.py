@@ -3,6 +3,7 @@ import torch.utils.data as data
 
 class CombineDBs(data.Dataset):
     NUM_CLASSES = 21
+
     def __init__(self, dataloaders, excluded=None):
         self.dataloaders = dataloaders
         self.excluded = excluded
@@ -53,7 +54,7 @@ class CombineDBs(data.Dataset):
     def __str__(self):
         include_db = [str(db) for db in self.dataloaders]
         exclude_db = [str(db) for db in self.excluded]
-        return 'Included datasets:'+str(include_db)+'\n'+'Excluded datasets:'+str(exclude_db)
+        return 'Included datasets:' + str(include_db) + '\n' + 'Excluded datasets:' + str(exclude_db)
 
 
 if __name__ == "__main__":

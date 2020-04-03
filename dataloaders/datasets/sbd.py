@@ -10,6 +10,7 @@ from mypath import Path
 from torchvision import transforms
 from dataloaders import custom_transforms as tr
 
+
 class SBDSegmentation(data.Dataset):
     NUM_CLASSES = 21
 
@@ -29,7 +30,6 @@ class SBDSegmentation(data.Dataset):
         self._image_dir = os.path.join(self._dataset_dir, 'img')
         self._cat_dir = os.path.join(self._dataset_dir, 'cls')
 
-
         if isinstance(split, str):
             self.split = [split]
         else:
@@ -48,7 +48,7 @@ class SBDSegmentation(data.Dataset):
 
             for line in lines:
                 _image = os.path.join(self._image_dir, line + ".jpg")
-                _categ= os.path.join(self._cat_dir, line + ".mat")
+                _categ = os.path.join(self._cat_dir, line + ".mat")
                 assert os.path.isfile(_image)
                 assert os.path.isfile(_categ)
                 self.im_ids.append(line)
@@ -59,7 +59,6 @@ class SBDSegmentation(data.Dataset):
 
         # Display stats
         print('Number of images: {:d}'.format(len(self.images)))
-
 
     def __getitem__(self, index):
         _img, _target = self._make_img_gt_point_pair(index)
@@ -85,7 +84,6 @@ class SBDSegmentation(data.Dataset):
             tr.ToTensor()])
 
         return composed_transforms(sample)
-
 
     def __str__(self):
         return 'SBDSegmentation(split=' + str(self.split) + ')'

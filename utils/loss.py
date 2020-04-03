@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 class SegmentationLosses(object):
     def __init__(self, weight=None, size_average=True, batch_average=True, ignore_index=255, cuda=False):
         self.ignore_index = ignore_index
@@ -50,6 +51,7 @@ class SegmentationLosses(object):
 
         return loss
 
+
 if __name__ == "__main__":
     loss = SegmentationLosses(cuda=True)
     a = torch.rand(1, 3, 7, 7).cuda()
@@ -57,7 +59,3 @@ if __name__ == "__main__":
     print(loss.CrossEntropyLoss(a, b).item())
     print(loss.FocalLoss(a, b, gamma=0, alpha=None).item())
     print(loss.FocalLoss(a, b, gamma=2, alpha=0.5).item())
-
-
-
-

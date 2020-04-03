@@ -9,13 +9,14 @@ from pycocotools import mask
 from torchvision import transforms
 from dataloaders import custom_transforms as tr
 from PIL import Image, ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 class COCOSegmentation(Dataset):
     NUM_CLASSES = 21
     CAT_LIST = [0, 5, 2, 16, 9, 44, 6, 3, 17, 62, 21, 67, 18, 19, 4,
-        1, 64, 20, 63, 7, 72]
+                1, 64, 20, 63, 7, 72]
 
     def __init__(self,
                  args,
@@ -113,10 +114,8 @@ class COCOSegmentation(Dataset):
 
         return composed_transforms(sample)
 
-
     def __len__(self):
         return len(self.ids)
-
 
 
 if __name__ == "__main__":

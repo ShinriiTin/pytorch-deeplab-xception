@@ -6,6 +6,7 @@ from modeling.aspp import build_aspp
 from modeling.decoder import build_decoder
 from modeling.backbone import build_backbone
 
+
 class DeepLab(nn.Module):
     def __init__(self, backbone='resnet', output_stride=16, num_classes=21,
                  sync_bn=True, freeze_bn=False):
@@ -71,11 +72,10 @@ class DeepLab(nn.Module):
                             if p.requires_grad:
                                 yield p
 
+
 if __name__ == "__main__":
     model = DeepLab(backbone='mobilenet', output_stride=16)
     model.eval()
     input = torch.rand(1, 3, 513, 513)
     output = model(input)
     print(output.size())
-
-

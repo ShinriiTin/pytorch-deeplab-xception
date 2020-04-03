@@ -5,6 +5,7 @@ import math
 from modeling.sync_batchnorm.batchnorm import SynchronizedBatchNorm2d
 import torch.utils.model_zoo as model_zoo
 
+
 def conv_bn(inp, oup, stride, BatchNorm):
     return nn.Sequential(
         nn.Conv2d(inp, oup, 3, stride, 1, bias=False),
@@ -142,6 +143,7 @@ class MobileNetV2(nn.Module):
             elif isinstance(m, nn.BatchNorm2d):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
+
 
 if __name__ == "__main__":
     input = torch.rand(1, 3, 512, 512)

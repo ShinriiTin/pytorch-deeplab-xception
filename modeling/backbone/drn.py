@@ -168,7 +168,6 @@ class DRN(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
 
-
     def _make_layer(self, block, planes, blocks, stride=1, dilation=1,
                     new_level=True, residual=True, BatchNorm=None):
         assert dilation == 1 or dilation % 2 == 0
@@ -280,7 +279,7 @@ class DRN_A(nn.Module):
         self.inplanes = planes * block.expansion
         for i in range(1, blocks):
             layers.append(block(self.inplanes, planes,
-                                dilation=(dilation, dilation, ), BatchNorm=BatchNorm))
+                                dilation=(dilation, dilation,), BatchNorm=BatchNorm))
 
         return nn.Sequential(*layers)
 
@@ -296,6 +295,7 @@ class DRN_A(nn.Module):
         x = self.layer4(x)
 
         return x
+
 
 def drn_a_50(BatchNorm, pretrained=True):
     model = DRN_A(Bottleneck, [3, 4, 6, 3], BatchNorm=BatchNorm)
@@ -393,8 +393,10 @@ def drn_d_105(BatchNorm, pretrained=True):
         model.load_state_dict(pretrained)
     return model
 
+
 if __name__ == "__main__":
     import torch
+
     model = drn_a_50(BatchNorm=nn.BatchNorm2d, pretrained=True)
     input = torch.rand(1, 3, 512, 512)
     output, low_level_feat = model(input)

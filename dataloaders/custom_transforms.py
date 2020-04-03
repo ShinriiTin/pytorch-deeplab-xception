@@ -4,12 +4,14 @@ import numpy as np
 
 from PIL import Image, ImageOps, ImageFilter
 
+
 class Normalize(object):
     """Normalize a tensor image with mean and standard deviation.
     Args:
         mean (tuple): means for each channel.
         std (tuple): standard deviations for each channel.
     """
+
     def __init__(self, mean=(0., 0., 0.), std=(1., 1., 1.)):
         self.mean = mean
         self.std = std
@@ -65,7 +67,7 @@ class RandomRotate(object):
     def __call__(self, sample):
         img = sample['image']
         mask = sample['label']
-        rotate_degree = random.uniform(-1*self.degree, self.degree)
+        rotate_degree = random.uniform(-1 * self.degree, self.degree)
         img = img.rotate(rotate_degree, Image.BILINEAR)
         mask = mask.rotate(rotate_degree, Image.NEAREST)
 
@@ -147,6 +149,7 @@ class FixScaleCrop(object):
 
         return {'image': img,
                 'label': mask}
+
 
 class FixedResize(object):
     def __init__(self, size):
