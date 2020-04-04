@@ -1,0 +1,1 @@
+CUDA_VISIBLE_DEVICES=0 python test.py --backbone resnet --workers 4 --batch-size 4 --gpu-ids 0 --checkname deeplab-resnet --dataset coco --resume /home/shinriitin/GraduationProject/pytorch-deeplab-xception/run/coco/deeplab-resnet/model_best.pth.tar --output_dir /home/shinriitin/GraduationProject/test_result
