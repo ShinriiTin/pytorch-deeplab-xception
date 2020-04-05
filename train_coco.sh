@@ -1,1 +1,1 @@
-CUDA_VISIBLE_DEVICES=0 python train.py --backbone resnet --lr 0.01 --workers 4 --epochs 70 --batch-size 4 --gpu-ids 0 --checkname deeplab-resnet --eval-interval 1 --dataset coco --resume /home/shinriitin/GraduationProject/pytorch-deeplab-xception/run/coco/deeplab-resnet/model_best.pth.tar
+CUDA_VISIBLE_DEVICES=0 python train.py --backbone resnet --lr 0.01 --workers 4 --epochs 100 --batch-size 4 --gpu-ids 0 --checkname deeplab-resnet --eval-interval 1 --dataset coco --resume /home/shinriitin/GraduationProject/pytorch-deeplab-xception/run/coco/deeplab-resnet/model_best.pth.tar

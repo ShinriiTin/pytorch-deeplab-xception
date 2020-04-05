@@ -4,11 +4,13 @@ import os
 import os.path as osp
 
 from dataloaders import make_data_loader
+from dataloaders.utils import decode_segmap
 from dataloaders.utils import decode_seg_map_sequence
 from modeling.deeplab import *
 from modeling.sync_batchnorm.replicate import patch_replication_callback
 from utils.loss import SegmentationLosses
 from utils.metrics import Evaluator
+from utils.rail_handler import get_rail_from_mask
 from torchvision.utils import save_image
 from tqdm import tqdm
 
@@ -61,9 +63,14 @@ class Tester(object):
         save_image(decode_seg_map_sequence(torch.max(pred[:4], 1)[1].detach().cpu().numpy(),
                                            dataset=dataset), osp.join(self.args.output_dir, '%d_pred.jpg' % i), 2,
                    normalize=False, range=(0, 255))
+        get_rail_from_mask(decode_segmap(torch.max(pred[:4], 1)[1].detach().cpu().numpy()[0],
+                                         dataset=dataset))
         save_image(decode_seg_map_sequence(torch.squeeze(target[:4], 1).detach().cpu().numpy(),
                                            dataset=dataset), osp.join(self.args.output_dir, '%d_truth.jpg' % i), 2,
                    normalize=False, range=(0, 255))
+
+    def test_tensor(self, tensor):
+        print(tensor.shape)
 
     def validation(self):
         if not osp.exists(self.args.output_dir) or not osp.isdir(self.args.output_dir):
@@ -83,20 +90,14 @@ class Tester(object):
             test_loss += loss.item()
             tbar.set_description('Test loss: %.3f' % (test_loss / (i + 1)))
             self.visualize_image(self.args.dataset, i, image, target, output)
+            # self.test_tensor(decode_seg_map_sequence(torch.max(output[:4], 1)[1].detach().cpu().numpy(),
+            #                 dataset=self.args.dataset))
             pred = output.data.cpu().numpy()
             target = target.cpu().numpy()
             pred = np.argmax(pred, axis=1)
             # Add batch sample into evaluator
             self.evaluator.add_batch(target, pred)
-
-        # Fast test during the training
-        Acc = self.evaluator.Pixel_Accuracy()
-        Acc_class = self.evaluator.Pixel_Accuracy_Class()
-        mIoU = self.evaluator.Mean_Intersection_over_Union()
-        FWIoU = self.evaluator.Frequency_Weighted_Intersection_over_Union()
-        print('Validation:')
-        print("Acc:{}, Acc_class:{}, mIoU:{}, fwIoU: {}".format(Acc, Acc_class, mIoU, FWIoU))
-        print('Loss: %.3f' % test_loss)
+            break
 
 
 def main():
