@@ -3,7 +3,8 @@ import math
 import torch.utils.model_zoo as model_zoo
 from modeling.sync_batchnorm.batchnorm import SynchronizedBatchNorm2d
 
-webroot = 'http://dl.yf.io/drn/'
+# webroot = 'http://dl.yf.io/drn/'
+webroot = '/media/shinriitin/Programming/GraduationProject/ref-repos/'
 
 model_urls = {
     'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',

@@ -63,8 +63,11 @@ class Tester(object):
         save_image(decode_seg_map_sequence(torch.max(pred[:4], 1)[1].detach().cpu().numpy(),
                                            dataset=dataset), osp.join(self.args.output_dir, '%d_pred.jpg' % i), 2,
                    normalize=False, range=(0, 255))
-        get_rail_from_mask(decode_segmap(torch.max(pred[:4], 1)[1].detach().cpu().numpy()[0],
-                                         dataset=dataset))
+        rail, rail_type = get_rail_from_mask(decode_segmap(torch.max(pred[:4], 1)[1].detach().cpu().numpy()[0],
+                                                           dataset=dataset))
+        rail = torch.from_numpy(np.array([rail]).transpose([0, 3, 1, 2]))
+        save_image(rail, osp.join(self.args.output_dir, '%d_type_is_%s.jpg' % (i, rail_type)), 2, normalize=False,
+                   range=(0, 255))
         save_image(decode_seg_map_sequence(torch.squeeze(target[:4], 1).detach().cpu().numpy(),
                                            dataset=dataset), osp.join(self.args.output_dir, '%d_truth.jpg' % i), 2,
                    normalize=False, range=(0, 255))
@@ -90,14 +93,13 @@ class Tester(object):
             test_loss += loss.item()
             tbar.set_description('Test loss: %.3f' % (test_loss / (i + 1)))
             self.visualize_image(self.args.dataset, i, image, target, output)
-            # self.test_tensor(decode_seg_map_sequence(torch.max(output[:4], 1)[1].detach().cpu().numpy(),
-            #                 dataset=self.args.dataset))
             pred = output.data.cpu().numpy()
             target = target.cpu().numpy()
             pred = np.argmax(pred, axis=1)
             # Add batch sample into evaluator
             self.evaluator.add_batch(target, pred)
-            break
+            if i == 19:
+                break
 
 
 def main():
@@ -132,7 +134,7 @@ def main():
                                     testing (default: auto)')
     # cuda, seed and logging
     parser.add_argument('--no-cuda', action='store_true', default=
-                        False, help='disables CUDA training')
+    False, help='disables CUDA training')
     parser.add_argument('--gpu-ids', type=str, default='0',
                         help='use which gpu to train, must be a \
                             comma-separated list of integers only (default=0)')
