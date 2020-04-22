@@ -58,19 +58,24 @@ class Tester(object):
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.resume, checkpoint['epoch']))
 
-    def visualize_image(self, dataset, i, image, target, pred):
+    # def visualize_image(self, dataset, i, image, target, pred):
+    def visualize_image(self, dataset, pred):
+        '''
         save_image(image[:4].clone().cpu().data, osp.join(self.args.output_dir, '%d_image.jpg' % i), 2, normalize=True)
         save_image(decode_seg_map_sequence(torch.max(pred[:4], 1)[1].detach().cpu().numpy(),
                                            dataset=dataset), osp.join(self.args.output_dir, '%d_pred.jpg' % i), 2,
                    normalize=False, range=(0, 255))
+        '''
         rail, rail_type = get_rail_from_mask(decode_segmap(torch.max(pred[:4], 1)[1].detach().cpu().numpy()[0],
                                                            dataset=dataset))
+        '''
         rail = torch.from_numpy(np.array([rail]).transpose([0, 3, 1, 2]))
         save_image(rail, osp.join(self.args.output_dir, '%d_type_is_%s.jpg' % (i, rail_type)), 2, normalize=False,
                    range=(0, 255))
         save_image(decode_seg_map_sequence(torch.squeeze(target[:4], 1).detach().cpu().numpy(),
                                            dataset=dataset), osp.join(self.args.output_dir, '%d_truth.jpg' % i), 2,
                    normalize=False, range=(0, 255))
+                   '''
 
     def test_tensor(self, tensor):
         print(tensor.shape)
@@ -102,10 +107,42 @@ class Tester(object):
                 break
 
 
+def run_model(tester):
+    for i, sample in enumerate(tester.val_loader):
+        image = sample['image']
+        with torch.no_grad():
+            output = tester.model(image)
+
+
+def run_func(tester):
+    for i, sample in enumerate(tester.val_loader):
+        image = sample['image']
+        with torch.no_grad():
+            output = tester.model(image)
+        tester.visualize_image(tester.args.dataset, output)
+
+
+def test_fps(args):
+    import time
+    tester = Tester(args)
+    tester.model.eval()
+    times = 1
+    start = time.time()
+    for i in range(times):
+        run_model(tester)
+    t1 = time.time() - start
+    start = time.time()
+    for i in range(times):
+        run_func(tester)
+    t2 = time.time() - start
+    t = t2 - t1
+    print('FPS = %.5f' % (500 * times / t))
+
+
 def main():
     parser = argparse.ArgumentParser(description="PyTorch DeepLabV3Plus Testing")
     parser.add_argument('--backbone', type=str, default='resnet',
-                        choices=['resnet'],
+                        choices=['resnet', 'mobilenet', 'drn'],
                         help='backbone name (default: resnet)')
     parser.add_argument('--out-stride', type=int, default=16,
                         help='network output stride (default: 16)')
@@ -163,8 +200,7 @@ def main():
         else:
             args.sync_bn = False
 
-    tester = Tester(args)
-    tester.validation()
+    test_fps(args)
 
 
 if __name__ == '__main__':
