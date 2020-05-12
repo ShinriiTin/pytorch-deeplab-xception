@@ -60,13 +60,16 @@ class Tester(object):
 
     def visualize_image(self, dataset, i, image, target, pred):
     # def visualize_image(self, dataset, pred):
+        '''
         save_image(image[:4].clone().cpu().data, osp.join(self.args.output_dir, '%d_image.jpg' % i), 2, normalize=True)
         save_image(decode_seg_map_sequence(torch.max(pred[:4], 1)[1].detach().cpu().numpy(),
                                            dataset=dataset), osp.join(self.args.output_dir, '%d_pred.jpg' % i), 2,
                    normalize=False, range=(0, 255))
+                '''
 
         rail, rail_type = get_rail_from_mask(torch.max(pred[:4], 1)[1].detach().cpu().numpy()[0].view())
 
+        '''
         rail = torch.from_numpy(np.array(decode_seg_map_sequence([rail], dataset=dataset)))
 
         save_image(rail,
@@ -76,6 +79,7 @@ class Tester(object):
         save_image(decode_seg_map_sequence(torch.squeeze(target[:4], 1).detach().cpu().numpy(),
                                            dataset=dataset), osp.join(self.args.output_dir, '%d_truth.jpg' % i), 2,
                    normalize=False, range=(0, 255))
+        '''
 
     def test_tensor(self, tensor):
         print(tensor.shape)
@@ -112,8 +116,6 @@ def run_model(tester):
         image = sample['image'].cuda()
         with torch.no_grad():
             output = tester.model(image)
-        if i == 19:
-            break
 
 
 def run_func(tester):
@@ -123,8 +125,6 @@ def run_func(tester):
         with torch.no_grad():
             output = tester.model(image)
         tester.visualize_image(tester.args.dataset, i, image, target, output)
-        if i == 19:
-            break
 
 
 def test_fps(args):
@@ -134,15 +134,15 @@ def test_fps(args):
     times = 2
     start = time.time()
     for i in range(times):
-        run_func(tester)
+        run_model(tester)
     t2 = time.time() - start
-    print('FPS = %.5f' % (20 * times / t2))
+    print('FPS = %.5f' % (500 * times / t2))
 
 
 def main():
     parser = argparse.ArgumentParser(description="PyTorch DeepLabV3Plus Testing")
     parser.add_argument('--backbone', type=str, default='resnet',
-                        choices=['resnet', 'mobilenet', 'drn'],
+                        choices=['resnet', 'xception', 'drn', 'mobilenet'],
                         help='backbone name (default: resnet)')
     parser.add_argument('--out-stride', type=int, default=16,
                         help='network output stride (default: 16)')
