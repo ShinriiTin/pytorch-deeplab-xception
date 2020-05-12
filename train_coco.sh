@@ -1,1 +1,1 @@
-CUDA_VISIBLE_DEVICES=0 python train.py --backbone mobilenet --lr 0.01 --workers 4 --epochs 100 --batch-size 4 --gpu-ids 0 --checkname deeplab-mobilenet --eval-interval 1 --dataset coco --resume /home/shinriitin/GraduationProject/pytorch-deeplab-xception/run/coco/deeplab-mobilenet/model_best.pth.tar
+CUDA_VISIBLE_DEVICES=0 python train.py --backbone resnet --lr 0.01 --workers 8 --epochs 200 --batch-size 4 --gpu-ids 0 --checkname deeplab-resnet --eval-interval 1 --dataset coco --base-size 313 --crop-size 313

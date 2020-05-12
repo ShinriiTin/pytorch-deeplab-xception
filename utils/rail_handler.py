@@ -3,7 +3,7 @@ import queue
 
 
 def euclidean_distance(a, b):
-    return np.sqrt(np.sum(np.square(a - b)))
+    return np.sum(np.square(a - b))
 
 
 def get_new_mask(mask):
@@ -14,7 +14,7 @@ def get_new_mask(mask):
     for i in range(mask.shape[0]):
         for j in range(mask.shape[1]):
             if np.sum(mask[i][j]) > 0:
-                if np.sum(mask[int(start[0])][int(start[1])]) == 0 or \
+                if mask[int(start[0])][int(start[1])] == 0 or \
                         euclidean_distance(camera, [i, j]) < euclidean_distance(camera, start):
                     start = [i, j]
 
@@ -32,8 +32,8 @@ def get_new_mask(mask):
         if front[1] + 1 < mask.shape[1]:
             neighbors.append([front[0], front[1] + 1])
         for neighbor in neighbors:
-            if np.sum(mask[neighbor[0]][neighbor[1]]) > 0 and \
-                    np.sum(new_mask[neighbor[0]][neighbor[1]]) == 0:
+            if mask[neighbor[0]][neighbor[1]] > 0 and \
+                    new_mask[neighbor[0]][neighbor[1]] == 0:
                 new_mask[neighbor[0]][neighbor[1]] = mask[neighbor[0]][neighbor[1]]
                 q.put(neighbor)
 
@@ -73,8 +73,6 @@ def get_rail_from_mask(mask):
             if np.sum(new_mask[i][j]) > 0:
                 max_x = j
                 break
-        mid_x = (min_x + max_x) // 2
-        new_mask[i][mid_x] = [255, 255, 255]
         curve.append(np.array([(min_x + max_x) / 2, i]))
 
     return new_mask, check_curve(curve)
