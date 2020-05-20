@@ -134,7 +134,7 @@ def test_fps(args):
     times = 2
     start = time.time()
     for i in range(times):
-        run_model(tester)
+        run_func(tester)
     t2 = time.time() - start
     print('FPS = %.5f' % (500 * times / t2))
 

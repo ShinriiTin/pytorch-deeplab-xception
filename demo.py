@@ -119,7 +119,7 @@ def main():
         cv.putText(rail, rail_type, (rail.shape[0] // 2, rail.shape[1] // 2), cv.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1, 4)
         cv.imshow('InputVideoData', frame)
         cv.imshow('Prediction', rail)
-        if cv.waitKey(10) == ord('q'):
+        if cv.waitKey(1) == ord('q'):
             break
     cap.release()
     cv.destroyAllWindows()

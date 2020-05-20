@@ -102,17 +102,17 @@ get_rail_from_mask(const py::array_t<int64>& mask) {
         curve.emplace_back(min_x + max_x, 2 * i);
     }
 
-    if (curve.size() < 10) {
+    if (curve.size() < 20) {
         return {new_mask, "unknown"};
     }
     std::pair<int, int> start_direction =
-        {curve[4].first - curve[2].first + curve[9].first - curve[7].first,
-         curve[4].second - curve[2].second + curve[9].second - curve[7].second};
+        {curve[8].first - curve[4].first + curve[14].first - curve[10].first,
+         curve[8].second - curve[4].second + curve[14].second - curve[10].second};
     constexpr double lmt = std::cos(std::acos(-1.) / 12);
-    for (int i = 10; i + 9 < curve.size(); i += 10) {
+    for (int i = 20; i + 20 < curve.size(); i += 20) {
         std::pair<int, int> direction =
-            {curve[i + 4].first - curve[i + 2].first + curve[i + 9].first - curve[i + 7].first,
-             curve[i + 4].second - curve[i + 2].second + curve[i + 9].second - curve[i + 7].second};
+            {curve[i + 8].first - curve[i + 4].first + curve[i + 14].first - curve[i + 10].first,
+             curve[i + 8].second - curve[i + 4].second + curve[i + 14].second - curve[i + 10].second};
         double cos_alpha =
             (start_direction.first * direction.first + start_direction.second * direction.second) /
             std::sqrt(
