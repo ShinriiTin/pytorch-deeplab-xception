@@ -1,1 +1,1 @@
-CUDA_VISIBLE_DEVICES=0 python demo.py --backbone drn --gpu-ids 0 --dataset coco --resume /home/shinriitin/pytorch-deeplab-xception/run/coco/deeplab-drn/model_best.pth.tar
+CUDA_VISIBLE_DEVICES=0 python demo.py --backbone drn --gpu-ids 0 --dataset coco --resume /home/shinriitin/pytorch-deeplab-xception/run/coco/deeplab-drn-lr0.015/model_best.pth.tar

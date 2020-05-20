@@ -54,6 +54,8 @@ class Demo(object):
             tr.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
             tr.ToTensor()])
         frame = composed_transforms(frame)
+        if self.args.cuda:
+            frame = frame.cuda()
         with torch.no_grad():
             pred = self.model(frame)
         rail, rail_type = get_rail_from_mask(torch.max(pred[:4], 1)[1].detach().cpu().numpy()[0].view())
@@ -108,7 +110,9 @@ def main():
 
     cap = cv.VideoCapture('/home/shinriitin/GraduationProject/video_data/HX27071_长沙鸿汉_05_A节一端路况_20191109_224501.mp4')
     cv.namedWindow('InputVideoData')
+    cv.moveWindow('InputVideoData', 450, 50)
     cv.namedWindow('Prediction')
+    cv.moveWindow('Prediction', 50, 50)
     while cap.isOpened():
         ret, frame = cap.read()
         # if frame is read correctly ret is True
