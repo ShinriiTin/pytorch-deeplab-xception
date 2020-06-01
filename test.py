@@ -58,8 +58,12 @@ class Tester(object):
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.resume, checkpoint['epoch']))
 
-    def visualize_image(self, dataset, i, image, target, pred):
-    # def visualize_image(self, dataset, pred):
+    def visualize_image_by_pred(self, pred):
+        rail, rail_type = get_rail_from_mask(torch.max(pred[:4], 1)[1].detach().cpu().numpy()[0].view())
+        return rail_type
+
+    # def visualize_image(self, dataset, i, image, target, pred):
+    def visualize_image(self, dataset, target):
         '''
         save_image(image[:4].clone().cpu().data, osp.join(self.args.output_dir, '%d_image.jpg' % i), 2, normalize=True)
         save_image(decode_seg_map_sequence(torch.max(pred[:4], 1)[1].detach().cpu().numpy(),
@@ -67,7 +71,22 @@ class Tester(object):
                    normalize=False, range=(0, 255))
                 '''
 
-        rail, rail_type = get_rail_from_mask(torch.max(pred[:4], 1)[1].detach().cpu().numpy()[0].view())
+        # rail, rail_type = get_rail_from_mask(torch.max(pred[:4], 1)[1].detach().cpu().numpy()[0].view())
+
+        rail, rail_type = get_rail_from_mask(torch.squeeze(target[:4], 1).detach().cpu().numpy()[0].view())
+
+        '''
+        rail = decode_segmap(rail, self.args.dataset)
+        import matplotlib.pyplot as plt
+        plt.figure()
+        plt.title('display')
+        plt.subplot(211)
+        plt.imshow(rail)
+        target = decode_segmap(torch.squeeze(target[:4], 1).detach().cpu().numpy()[0].view(), self.args.dataset)
+        plt.subplot(212)
+        plt.imshow(target)
+        plt.show()
+        '''
 
         '''
         rail = torch.from_numpy(np.array(decode_seg_map_sequence([rail], dataset=dataset)))
@@ -80,6 +99,7 @@ class Tester(object):
                                            dataset=dataset), osp.join(self.args.output_dir, '%d_truth.jpg' % i), 2,
                    normalize=False, range=(0, 255))
         '''
+        return rail_type
 
     def test_tensor(self, tensor):
         print(tensor.shape)
@@ -111,6 +131,14 @@ class Tester(object):
                 break
 
 
+def trans(rail_type):
+    assert rail_type != 'unknown'
+    map = {'straight': 0,
+           'left': 1,
+           'right': 2}
+    return map[rail_type]
+
+
 def run_model(tester):
     for i, sample in enumerate(tester.val_loader):
         image = sample['image'].cuda()
@@ -119,24 +147,64 @@ def run_model(tester):
 
 
 def run_func(tester):
+    truth = []
+    with open('/home/shinriitin/GraduationProject/test.ans', 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+            if line == '\n':
+                break
+            truth.append(trans(line.split('\n')[0]))
+    # print(truth)
+    pred = []
     for i, sample in enumerate(tester.val_loader):
         image = sample['image'].cuda()
-        target = sample['label'].cuda()
         with torch.no_grad():
             output = tester.model(image)
-        tester.visualize_image(tester.args.dataset, i, image, target, output)
+        # target = sample['label'].cuda()
+        pred.append(trans(tester.visualize_image_by_pred(output)))
+    # print(pred)
+    for i in range(len(truth)):
+        if truth[i] != pred[i]:
+            print(i, truth[i], pred[i])
+
+    from sklearn.metrics import accuracy_score
+    from sklearn.metrics import precision_score
+    from sklearn.metrics import recall_score
+    from sklearn.metrics import f1_score
+    print('acc:', accuracy_score(truth, pred))
+    print('macro precision:', precision_score(truth, pred, average="macro"))
+    print('micro precision:', precision_score(truth, pred, average="micro"))
+    print('weighted precision:', precision_score(truth, pred, average="weighted"))
+    print('macro recall:', recall_score(truth, pred, average="macro"))
+    print('micro recall:', recall_score(truth, pred, average="micro"))
+    print('weighted recall:', recall_score(truth, pred, average="weighted"))
+    print('macro f1:', f1_score(truth, pred, average="macro"))
+    print('micro f1:', f1_score(truth, pred, average="micro"))
+    print('weighted f1:', f1_score(truth, pred, average="weighted"))
+
+
+def test_func(args):
+    tester = Tester(args)
+    tester.model.eval()
+    run_func(tester)
+
+
+def run_func_only(tester):
+    for i, sample in enumerate(tester.val_loader):
+        target = sample['label'].cuda()
+        tester.visualize_image(tester.args.dataset, target)
 
 
 def test_fps(args):
     import time
     tester = Tester(args)
     tester.model.eval()
-    times = 2
+    times = 10
     start = time.time()
     for i in range(times):
-        run_func(tester)
+        run_func_only(tester)
     t2 = time.time() - start
-    print('FPS = %.5f' % (500 * times / t2))
+    print('User Time = %.5f s, FPS = %.5f' % (t2, 500 * times / t2))
 
 
 def main():
@@ -200,7 +268,7 @@ def main():
         else:
             args.sync_bn = False
 
-    test_fps(args)
+    test_func(args)
 
 
 if __name__ == '__main__':

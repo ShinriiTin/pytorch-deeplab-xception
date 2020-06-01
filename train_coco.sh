@@ -1,1 +1,2 @@
-CUDA_VISIBLE_DEVICES=0 python train.py --backbone xception --lr 0.0095 --workers 8 --epochs 300 --batch-size 4 --gpu-ids 0 --checkname deeplab-xception-lr0.0095 --eval-interval 1 --dataset coco --base-size 313 --crop-size 313 --loss-type ce
+CUDA_VISIBLE_DEVICES=0 python train.py --backbone resnet --lr 0.0095 --workers 8 --epochs 300 --batch-size 4 --gpu-ids 0 --checkname deeplab-resnet-lr0.0095 --eval-interval 1 --dataset coco --base-size 313 --crop-size 313 --loss-type ce
+CUDA_VISIBLE_DEVICES=0 python train.py --backbone drn --lr 0.0095 --workers 8 --epochs 300 --batch-size 4 --gpu-ids 0 --checkname deeplab-drn-lr0.0095 --eval-interval 1 --dataset coco --base-size 313 --crop-size 313 --loss-type ce

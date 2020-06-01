@@ -1,7 +1,8 @@
 import torch
+import random
 import numpy as np
 
-from PIL import Image
+from PIL import Image, ImageOps, ImageFilter
 
 
 class Normalize(object):
@@ -59,5 +60,15 @@ class FixScaleCrop(object):
         x1 = int(round((w - self.crop_size) / 2.))
         y1 = int(round((h - self.crop_size) / 2.))
         img = img.crop((x1, y1, x1 + self.crop_size, y1 + self.crop_size))
+
+        return img
+
+
+class RandomGaussianBlur(object):
+    def __call__(self, sample):
+        img = sample
+        if random.random() < 0.5:
+            img = img.filter(ImageFilter.GaussianBlur(
+                radius=random.random()))
 
         return img

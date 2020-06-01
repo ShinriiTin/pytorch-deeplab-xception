@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 from mypath import Path
 from tqdm import trange
 import os
+import os.path as osp
 from pycocotools.coco import COCO
 from pycocotools import mask
 from torchvision import transforms
@@ -133,7 +134,9 @@ if __name__ == "__main__":
 
     coco_val = COCOSegmentation(args, split='val', year='2017')
 
-    dataloader = DataLoader(coco_val, batch_size=4, shuffle=True, num_workers=0)
+    dataloader = DataLoader(coco_val, batch_size=1, shuffle=False, num_workers=0)
+
+    output_dir = '/home/shinriitin/GraduationProject/test8'
 
     for ii, sample in enumerate(dataloader):
         for jj in range(sample["image"].size()[0]):
@@ -146,14 +149,5 @@ if __name__ == "__main__":
             img_tmp += (0.485, 0.456, 0.406)
             img_tmp *= 255.0
             img_tmp = img_tmp.astype(np.uint8)
-            plt.figure()
-            plt.title('display')
-            plt.subplot(211)
-            plt.imshow(img_tmp)
-            plt.subplot(212)
-            plt.imshow(segmap)
-
-        if ii == 1:
-            break
-
-    plt.show(block=True)
+            im = Image.fromarray(img_tmp)
+            im.save(osp.join(output_dir, '%d.png' % ii), quality=95, subsample=False)

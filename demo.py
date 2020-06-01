@@ -2,7 +2,9 @@ import argparse
 import cv2 as cv
 import numpy as np
 import os
+import os.path as osp
 import torch
+import time
 
 from dataloaders.utils import decode_segmap
 from mask_handler import get_rail_from_mask
@@ -108,23 +110,37 @@ def main():
 
     demo = Demo(args)
 
+    output_dir = '/home/shinriitin/GraduationProject/demo_test'
+
     cap = cv.VideoCapture('/home/shinriitin/GraduationProject/video_data/HX27071_长沙鸿汉_05_A节一端路况_20191109_224501.mp4')
+    frames = 0
     cv.namedWindow('InputVideoData')
-    cv.moveWindow('InputVideoData', 450, 50)
+    cv.moveWindow('InputVideoData', args.crop_size + 150, 50)
     cv.namedWindow('Prediction')
     cv.moveWindow('Prediction', 50, 50)
+    t1 = time.time()
     while cap.isOpened():
         ret, frame = cap.read()
         # if frame is read correctly ret is True
         if not ret:
             print("Can't receive frame (stream end?). Exiting ...")
             break
-        rail, rail_type = demo.predict(frame)
-        cv.putText(rail, rail_type, (rail.shape[0] // 2, rail.shape[1] // 2), cv.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1, 4)
+        frames += 1
+        rail, rail_type = demo.predict(frame.copy())
+        cv.putText(rail, rail_type, (rail.shape[0] // 2, rail.shape[1] // 2), cv.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0),
+                   1, 4)
         cv.imshow('InputVideoData', frame)
         cv.imshow('Prediction', rail)
+        if frames % 90 == 0:
+            cv.imwrite(osp.join(output_dir, 'InputVideoData_%d.jpg' % frames), frame)
+            cv.imwrite(osp.join(output_dir, 'Prediction_%d.jpg' % frames), rail)
         if cv.waitKey(1) == ord('q'):
             break
+    t2 = time.time()
+    print(frames)
+    print(t1)
+    print(t2)
+    print('FPS: %.5f' % (frames / (t2 - t1)))
     cap.release()
     cv.destroyAllWindows()
 
